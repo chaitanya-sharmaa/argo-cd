@@ -11,7 +11,7 @@ spec:
       repoURL: https://github.com/chaitanya-sharmaa/argo-cd.git
       revision: main
       directories:
-      - path: workloads/*
+      - path: workloads/*/overlays/prod
   template:
     metadata:
       name: '{{.path.basename}}'
