@@ -20,7 +20,10 @@ spec:
       source:
         repoURL: https://github.com/chaitanya-sharmaa/argo-cd.git
         targetRevision: main
-        path: '{{.path.path}}/overlays/prod'
+        path: '{{.path.path}}'
+        helm:
+          valueFiles:
+            - values-prod.yaml
       destination:
         server: https://kubernetes.default.svc
         namespace: default
