@@ -3,16 +3,18 @@ kind: Application
 metadata:
   name: root-app
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
     repoURL: https://github.com/chaitanya-sharmaa/argo-cd.git
-    targetRevision: HEAD
+    targetRevision: main
     path: apps
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: argocd
   syncPolicy:
     automated:
-      prune: true
       selfHeal: true
+      prune: false
