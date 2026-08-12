@@ -11,7 +11,7 @@ spec:
       repoURL: https://github.com/chaitanya-sharmaa/argo-cd.git
       revision: main
       directories:
-      - path: workloads/*/overlays/prod
+      - path: workloads/*
   template:
     metadata:
       name: '{{.path.basename}}'
@@ -20,7 +20,7 @@ spec:
       source:
         repoURL: https://github.com/chaitanya-sharmaa/argo-cd.git
         targetRevision: main
-        path: '{{.path.path}}'
+        path: '{{.path.path}}/overlays/prod'
       destination:
         server: https://kubernetes.default.svc
         namespace: default
