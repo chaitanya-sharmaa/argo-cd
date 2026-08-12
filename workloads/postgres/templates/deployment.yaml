@@ -1,27 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-api
+  name: postgres
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: backend-api
+      app: postgres
   template:
     metadata:
       labels:
-        app: backend-api
+        app: postgres
     spec:
       containers:
-      - name: api
-        image: nginxdemos/hello:plain-text
+      - name: postgres
+        image: postgres:15-alpine
         ports:
-        - containerPort: 80
+        - containerPort: 5432
         env:
-        - name: DB_HOST
-          value: "postgres"
-        - name: DB_PASSWORD
+        - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: backend-db-secret
+              name: postgres-db-secret
               key: password
