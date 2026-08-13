@@ -2,7 +2,52 @@
 
 Welcome to the production GitOps repository! This repository contains both the Infrastructure as Code (Terraform) to build a secure AWS EKS cluster, and the GitOps manifests (Helm/Argo CD) to deploy the microservices.
 
-## Architecture
+## 🌟 High-Level Architecture (Demo View)
+This diagram illustrates the high-level GitOps workflow and traffic routing, perfect for understanding the value of the platform.
+
+```mermaid
+flowchart LR
+    %% Colors and Styles
+    classDef user fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:white;
+    classDef git fill:#24292E,stroke:#000,stroke-width:2px,color:white;
+    classDef argocd fill:#EF7B45,stroke:#D84315,stroke-width:2px,color:white;
+    classDef aws fill:#232F3E,stroke:#FF9900,stroke-width:2px,color:white;
+    classDef db fill:#336791,stroke:#2c3e50,stroke-width:2px,color:white;
+    classDef vault fill:#000000,stroke:#607D8B,stroke-width:2px,color:white;
+
+    Dev(("👨‍💻 Developer")):::user
+    User(("👤 End User")):::user
+    
+    Git["🐙 GitHub\n(Source of Truth)"]:::git
+    Argo["🦑 Argo CD\n(GitOps Engine)"]:::argocd
+    ALB["🌐 AWS Load Balancer"]:::aws
+    
+    subgraph EKS ["Kubernetes (AWS EKS)"]
+        UI["🎨 Guestbook UI"]:::aws
+        API["⚙️ Backend API"]:::aws
+        DB[("🐘 Postgres DB")]:::db
+        Vault["🗄️ HashiCorp Vault\n(Secrets)"]:::vault
+    end
+
+    %% GitOps Flow
+    Dev == "1. Pushes Code/Config" ===> Git
+    Git -. "2. Monitors Changes" .-> Argo
+    Argo == "3. Automatically Deploys" ===> UI
+    Argo == "3. Automatically Deploys" ===> API
+    Argo == "3. Automatically Deploys" ===> Vault
+
+    %% Traffic Flow
+    User == "Visits Website" ===> ALB
+    ALB -->|/| UI
+    ALB -->|/api| API
+    API -->|Reads Data| DB
+    
+    %% Secrets Flow
+    Vault -. "4. Injects Passwords\n(External Secrets)" .-> DB
+```
+
+## 🛠️ Network Architecture (Engineering View)
+This diagram illustrates the deep-dive AWS network topology, VPC boundaries, and exact component placement.
 
 ```mermaid
 flowchart TD
@@ -16,7 +61,7 @@ flowchart TD
 
             subgraph Private["Private Subnets (EKS Worker Nodes)"]
                 subgraph EKS["EKS Cluster: gitops-prod-cluster"]
-                    ArgoCD["🐙 Argo CD (GitOps Controller)"]
+                    ArgoCD["🐙 Argo CD (Controller)"]
                     ALBController["⚙️ AWS ALB Controller"]
                     ESO["🔐 External Secrets Operator"]
                     Vault["🗄️ HashiCorp Vault"]
