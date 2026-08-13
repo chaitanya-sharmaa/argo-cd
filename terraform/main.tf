@@ -4,6 +4,12 @@ terraform {
     key    = "eks-cluster/terraform.tfstate"
     region = "eu-north-1"
   }
+  required_providers {
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.12.0"
+    }
+  }
 }
 
 provider "aws" {
