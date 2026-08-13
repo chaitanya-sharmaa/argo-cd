@@ -47,50 +47,9 @@ flowchart LR
 ```
 
 ## 🛠️ Network Architecture (Engineering View)
-This diagram illustrates the deep-dive AWS network topology, VPC boundaries, and exact component placement.
 
-```mermaid
-flowchart TD
-    subgraph AWS["☁️ AWS Cloud (eu-north-1)"]
-        subgraph VPC["VPC (10.0.0.0/16)"]
-            
-            subgraph Public["Public Subnets"]
-                ALB["🌐 AWS Application Load Balancer"]
-                NAT["🔀 NAT Gateway"]
-            end
+![AWS Network Architecture Diagram](docs/architecture.png)
 
-            subgraph Private["Private Subnets (EKS Worker Nodes)"]
-                subgraph EKS["EKS Cluster: gitops-prod-cluster"]
-                    ArgoCD["🐙 Argo CD (Controller)"]
-                    ALBController["⚙️ AWS ALB Controller"]
-                    ESO["🔐 External Secrets Operator"]
-                    Vault["🗄️ HashiCorp Vault"]
-                    
-                    subgraph Apps["Workloads"]
-                        Guestbook["🎨 Guestbook UI (/)"]
-                        BackendAPI["⚙️ Backend API (/api)"]
-                        Postgres["🐘 Postgres DB"]
-                    end
-                end
-            end
-        end
-    end
-
-    User(("👤 User")) -->|HTTPS Traffic| ALB
-    ALB -->|Routes '/'| Guestbook
-    ALB -->|Routes '/api'| BackendAPI
-    BackendAPI -->|Internal TCP| Postgres
-    
-    GitHub[("🐈‍⬛ GitHub Repository")]
-    
-    ArgoCD -.->|1. Pulls Manifests| GitHub
-    ArgoCD -.->|2. Synchronizes| Apps
-    ArgoCD -.->|2. Synchronizes| Vault
-    
-    ALBController -.->|Listens for Ingress & Creates| ALB
-    ESO -.->|Fetches DB Password| Vault
-    ESO -.->|Injects Native k8s Secret| Postgres
-```
 
 ---
 
