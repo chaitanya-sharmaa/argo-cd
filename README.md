@@ -77,7 +77,7 @@ terraform apply
 ## 3. Connect to the Cluster
 Once Terraform completes, update your local `kubeconfig` to talk to the new cluster:
 ```bash
-aws eks update-kubeconfig --region us-east-1 --name gitops-prod-cluster
+aws eks update-kubeconfig --region eu-north-1 --name gitops-prod-cluster
 ```
 
 ## 4. Install Argo CD (The GitOps Engine)
