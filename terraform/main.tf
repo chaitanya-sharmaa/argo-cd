@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "acme-corp-terraform-state-e31e6482"
+    key    = "eks-cluster/terraform.tfstate"
+    region = "eu-north-1"
+  }
+}
+
 provider "aws" {
   region = var.region
 }
