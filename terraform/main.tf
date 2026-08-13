@@ -144,3 +144,46 @@ resource "helm_release" "aws_load_balancer_controller" {
 
   depends_on = [module.eks]
 }
+
+# ---------------------------------------------------------
+# 4. Argo CD (GitOps Controller)
+# ---------------------------------------------------------
+resource "helm_release" "argocd" {
+  name             = "argocd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  namespace        = "argocd"
+  create_namespace = true
+  version          = "7.3.11"
+
+  # Expose the Argo CD UI via an AWS Application Load Balancer
+  set {
+    name  = "server.service.type"
+    value = "LoadBalancer"
+  }
+
+  # Use AWS ALB annotations so the ALB Controller picks it up
+  set {
+    name  = "server.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
+    value = "external"
+  }
+
+  set {
+    name  = "server.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-scheme"
+    value = "internet-facing"
+  }
+
+  set {
+    name  = "server.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-nlb-target-type"
+    value = "ip"
+  }
+
+  # Disable TLS on the server so the load balancer can communicate plainly
+  # (TLS is terminated at the ALB level)
+  set {
+    name  = "configs.params.server\\.insecure"
+    value = "true"
+  }
+
+  depends_on = [helm_release.aws_load_balancer_controller]
+}
